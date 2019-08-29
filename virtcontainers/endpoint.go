@@ -41,6 +41,9 @@ const (
 	// VethEndpointType is the virtual network interface.
 	VethEndpointType EndpointType = "virtual"
 
+	// VlanEndpointType is the virtual network interface.
+	VlanEndpointType EndpointType = "virtual"
+
 	// VhostUserEndpointType is the vhostuser network interface.
 	VhostUserEndpointType EndpointType = "vhost-user"
 

@@ -1384,10 +1384,12 @@ func createEndpoint(netInfo NetworkInfo, idx int, model NetInterworkingModel) (E
 			endpoint, err = createTapNetworkEndpoint(idx, netInfo.Iface.Name)
 		} else if netInfo.Iface.Type == "veth" {
 			endpoint, err = createVethNetworkEndpoint(idx, netInfo.Iface.Name, model)
+		} else if netInfo.Iface.Type == "vlan" {
+			endpoint, err = createVlanNetworkEndpoint(idx, netInfo.Iface.Name, model)
 		} else if netInfo.Iface.Type == "ipvlan" {
 			endpoint, err = createIPVlanNetworkEndpoint(idx, netInfo.Iface.Name)
 		} else {
-			return nil, fmt.Errorf("Unsupported network interface")
+			return nil, fmt.Errorf("unsupported network interface, type:%s, model:%v", netInfo.Iface.Type, model)
 		}
 	}
 
