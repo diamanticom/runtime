@@ -454,7 +454,7 @@ func networkModelToQemuType(model NetInterworkingModel) govmmQemu.NetDeviceType 
 
 func (q *qemuArchBase) appendNetwork(devices []govmmQemu.Device, endpoint Endpoint) []govmmQemu.Device {
 	switch ep := endpoint.(type) {
-	case *VethEndpoint, *BridgedMacvlanEndpoint, *IPVlanEndpoint:
+	case *VlanEndpoint, *VethEndpoint, *BridgedMacvlanEndpoint, *IPVlanEndpoint:
 		netPair := ep.NetworkPair()
 		devices = append(devices,
 			govmmQemu.NetDevice{

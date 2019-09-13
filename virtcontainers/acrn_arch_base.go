@@ -721,7 +721,7 @@ func networkModelToAcrnType(model NetInterworkingModel) NetDeviceType {
 
 func (a *acrnArchBase) appendNetwork(devices []Device, endpoint Endpoint) []Device {
 	switch ep := endpoint.(type) {
-	case *VethEndpoint:
+	case *VethEndpoint, *VlanEndpoint:
 		netPair := ep.NetworkPair()
 		devices = append(devices,
 			NetDevice{

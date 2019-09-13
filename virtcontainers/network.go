@@ -262,6 +262,10 @@ func generateEndpoints(typedEndpoints []TypedJSONEndpoint) ([]Endpoint, error) {
 			var endpoint IPVlanEndpoint
 			endpointInf = &endpoint
 
+		case VlanEndpointType:
+			var endpoint VlanEndpoint
+			endpointInf = &endpoint
+
 		default:
 			networkLogger().WithField("endpoint-type", e.Type).Error("Ignoring unknown endpoint type")
 		}
@@ -373,6 +377,8 @@ func getLinkForEndpoint(endpoint Endpoint, netHandle *netlink.Handle) (netlink.L
 		link = &netlink.Macvlan{}
 	case *IPVlanEndpoint:
 		link = &netlink.IPVlan{}
+	case *VlanEndpoint:
+		link = &netlink.Vlan{}
 	default:
 		return nil, fmt.Errorf("Unexpected endpointType %s", ep.Type())
 	}
@@ -387,6 +393,10 @@ func getLinkByName(netHandle *netlink.Handle, name string, expectedLink netlink.
 	}
 
 	switch expectedLink.Type() {
+	case (&netlink.Vlan{}).Type():
+		if l, ok := link.(*netlink.Vlan); ok {
+			return l, nil
+		}
 	case (&netlink.Bridge{}).Type():
 		if l, ok := link.(*netlink.Bridge); ok {
 			return l, nil
