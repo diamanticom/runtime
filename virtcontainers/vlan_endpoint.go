@@ -1,6 +1,9 @@
 package virtcontainers
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/containernetworking/plugins/pkg/ns"
+)
 
 // VlanEndpoint gathers a network pair and its properties.
 type VlanEndpoint struct {
@@ -13,7 +16,27 @@ type VlanEndpoint struct {
 }
 
 func createVlanNetworkEndpoint(idx int, ifName string, interworkingModel NetInterworkingModel) (*VlanEndpoint, error) {
-	return nil, fmt.Errorf("vlan net endpoint is not implemented")
+	if idx < 0 {
+		return &VlanEndpoint{}, fmt.Errorf("invalid network endpoint index: %d", idx)
+	}
+	netPair, err := createNetworkInterfacePair(idx, ifName, interworkingModel)
+	if err != nil {
+		return nil, err
+	}
+
+	endpoint := &VlanEndpoint{
+		// TODO This is too specific. We may need to create multiple
+		// end point types here and then decide how to connect them
+		// at the time of hypervisor attach and not here
+		NetPair:      netPair,
+		EndpointType: VlanEndpointType,
+	}
+	if ifName != "" {
+		endpoint.NetPair.VirtIface.Name = ifName
+	}
+
+	return endpoint, nil
+
 }
 
 // Properties returns properties for the vlan interface in the network pair.
@@ -59,14 +82,28 @@ func (endpoint *VlanEndpoint) SetProperties(properties NetworkInfo) {
 
 // Attach for vlan endpoint bridges the network pair and adds the
 // tap interface of the network pair to the hypervisor.
-func (endpoint *VlanEndpoint) Attach(hypervisor) error {
-	return fmt.Errorf("attach for vlan endpoint is not yet implemented")
+func (endpoint *VlanEndpoint) Attach(h hypervisor) error {
+	if err := xConnectVMNetwork(endpoint, h); err != nil {
+		networkLogger().WithError(err).Error("Error bridging vlan ep")
+		return err
+	}
+
+	rc := h.addDevice(endpoint, netDev)
+	return rc
 }
 
 // Detach for the vlan endpoint tears down the tap and bridge
 // created for the vlan interface.
 func (endpoint *VlanEndpoint) Detach(netNsCreated bool, netNsPath string) error {
-	return fmt.Errorf("detach for vlan endpoint is not yet implemented")
+	// The network namespace would have been deleted at this point
+	// if it has not been created by virtcontainers.
+	if !netNsCreated {
+		return nil
+	}
+
+	return doNetNS(netNsPath, func(_ ns.NetNS) error {
+		return xDisconnectVMNetwork(endpoint)
+	})
 }
 
 // HotAttach for the vlan endpoint uses hot plug device
