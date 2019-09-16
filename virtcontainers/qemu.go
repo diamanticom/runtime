@@ -846,48 +846,45 @@ func (q *qemu) waitSandbox(timeout int) error {
 // stopSandbox will stop the Sandbox's VM.
 func (q *qemu) stopSandbox() error {
 	return nil
-	//XXX uncomment this
-	/*
-		span, _ := q.trace("stopSandbox")
-		defer span.Finish()
+	span, _ := q.trace("stopSandbox")
+	defer span.Finish()
 
-		q.Logger().Info("Stopping Sandbox")
-		if q.stopped {
-			q.Logger().Info("Already stopped")
-			return nil
-		}
+	q.Logger().Info("Stopping Sandbox")
+	if q.stopped {
+		q.Logger().Info("Already stopped")
+		return nil
+	}
 
-		defer func() {
-			q.cleanupVM()
-			q.stopped = true
-		}()
+	defer func() {
+		q.cleanupVM()
+		q.stopped = true
+	}()
 
-		if q.config.Debug && q.qemuConfig.LogFile != "" {
-			f, err := os.OpenFile(q.qemuConfig.LogFile, os.O_RDONLY, 0)
-			if err == nil {
-				scanner := bufio.NewScanner(f)
-				for scanner.Scan() {
-					q.Logger().Debug(scanner.Text())
-				}
-				if err := scanner.Err(); err != nil {
-					q.Logger().WithError(err).Debug("read qemu log failed")
-				}
+	if q.config.Debug && q.qemuConfig.LogFile != "" {
+		f, err := os.OpenFile(q.qemuConfig.LogFile, os.O_RDONLY, 0)
+		if err == nil {
+			scanner := bufio.NewScanner(f)
+			for scanner.Scan() {
+				q.Logger().Debug(scanner.Text())
+			}
+			if err := scanner.Err(); err != nil {
+				q.Logger().WithError(err).Debug("read qemu log failed")
 			}
 		}
+	}
 
-		err := q.qmpSetup()
-		if err != nil {
-			return err
-		}
+	err := q.qmpSetup()
+	if err != nil {
+		return err
+	}
 
-		err = q.qmpMonitorCh.qmp.ExecuteQuit(q.qmpMonitorCh.ctx)
-		if err != nil {
-			q.Logger().WithError(err).Error("Fail to execute qmp QUIT")
-			return err
-		}
+	err = q.qmpMonitorCh.qmp.ExecuteQuit(q.qmpMonitorCh.ctx)
+	if err != nil {
+		q.Logger().WithError(err).Error("Fail to execute qmp QUIT")
+		return err
+	}
 
-		return nil
-	*/
+	return nil
 }
 
 func (q *qemu) cleanupVM() error {
