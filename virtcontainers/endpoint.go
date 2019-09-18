@@ -36,6 +36,9 @@ const (
 	// VethEndpointType is the virtual network interface.
 	VethEndpointType EndpointType = "virtual"
 
+	// VlanEndpointType is the virtual network interface.
+	VlanEndpointType EndpointType = "vlan"
+
 	// VhostUserEndpointType is the vhostuser network interface.
 	VhostUserEndpointType EndpointType = "vhost-user"
 
@@ -73,6 +76,9 @@ func (endpointType *EndpointType) Set(value string) error {
 	case "tap":
 		*endpointType = TapEndpointType
 		return nil
+	case "vlan":
+		*endpointType = VlanEndpointType
+		return nil
 	case "ipvlan":
 		*endpointType = IPVlanEndpointType
 		return nil
@@ -96,6 +102,8 @@ func (endpointType *EndpointType) String() string {
 		return string(MacvtapEndpointType)
 	case TapEndpointType:
 		return string(TapEndpointType)
+	case VlanEndpointType:
+		return string(VlanEndpointType)
 	case IPVlanEndpointType:
 		return string(IPVlanEndpointType)
 	default:

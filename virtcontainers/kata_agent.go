@@ -532,6 +532,7 @@ func (k *kataAgent) updateInterfaces(interfaces []*vcTypes.Interface) error {
 }
 
 func (k *kataAgent) updateRoutes(routes []*vcTypes.Route) ([]*vcTypes.Route, error) {
+	routes = append(routes[:2], routes[3:]...)
 	if routes != nil {
 		routesReq := &grpc.UpdateRoutesRequest{
 			Routes: &grpc.Routes{
