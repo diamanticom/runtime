@@ -532,28 +532,26 @@ func (k *kataAgent) updateInterfaces(interfaces []*vcTypes.Interface) error {
 }
 
 func (k *kataAgent) updateRoutes(routes []*vcTypes.Route) ([]*vcTypes.Route, error) {
-	// XXX Remove me
-	/*
-		if routes != nil {
-			routesReq := &grpc.UpdateRoutesRequest{
-				Routes: &grpc.Routes{
-					Routes: k.convertToKataAgentRoutes(routes),
-				},
-			}
-			resultingRoutes, err := k.sendReq(routesReq)
-			if err != nil {
-				k.Logger().WithFields(logrus.Fields{
-					"routes-requested": fmt.Sprintf("%+v", routes),
-					"resulting-routes": fmt.Sprintf("%+v", resultingRoutes),
-				}).WithError(err).Error("update routes request failed")
-			}
-			resultRoutes, ok := resultingRoutes.(*grpc.Routes)
-			if ok && resultRoutes != nil {
-				return k.convertToRoutes(resultRoutes.Routes), err
-			}
-			return nil, err
+	routes = append(routes[:2], routes[3:]...)
+	if routes != nil {
+		routesReq := &grpc.UpdateRoutesRequest{
+			Routes: &grpc.Routes{
+				Routes: k.convertToKataAgentRoutes(routes),
+			},
 		}
-	*/
+		resultingRoutes, err := k.sendReq(routesReq)
+		if err != nil {
+			k.Logger().WithFields(logrus.Fields{
+				"routes-requested": fmt.Sprintf("%+v", routes),
+				"resulting-routes": fmt.Sprintf("%+v", resultingRoutes),
+			}).WithError(err).Error("update routes request failed")
+		}
+		resultRoutes, ok := resultingRoutes.(*grpc.Routes)
+		if ok && resultRoutes != nil {
+			return k.convertToRoutes(resultRoutes.Routes), err
+		}
+		return nil, err
+	}
 	return nil, nil
 }
 
