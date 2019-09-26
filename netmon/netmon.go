@@ -336,11 +336,12 @@ func convertRoutes(netRoutes []netlink.Route) []vcTypes.Route {
 		}
 
 		route := vcTypes.Route{
-			Dest:    dst,
-			Gateway: gw,
-			Device:  dev,
-			Source:  src,
-			Scope:   uint32(netRoute.Scope),
+			Dest:     dst,
+			Gateway:  gw,
+			Device:   dev,
+			Source:   src,
+			Scope:    uint32(netRoute.Scope),
+			Priority: uint32(netRoute.Priority),
 		}
 
 		routes = append(routes, route)

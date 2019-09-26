@@ -532,7 +532,7 @@ func (k *kataAgent) updateInterfaces(interfaces []*vcTypes.Interface) error {
 }
 
 func (k *kataAgent) updateRoutes(routes []*vcTypes.Route) ([]*vcTypes.Route, error) {
-	routes = append(routes[:2], routes[3:]...)
+
 	if routes != nil {
 		routesReq := &grpc.UpdateRoutesRequest{
 			Routes: &grpc.Routes{
@@ -1968,11 +1968,12 @@ func (k *kataAgent) convertToKataAgentRoutes(routes []*vcTypes.Route) (aRoutes [
 		}
 
 		aRoute := &aTypes.Route{
-			Dest:    route.Dest,
-			Gateway: route.Gateway,
-			Device:  route.Device,
-			Source:  route.Source,
-			Scope:   route.Scope,
+			Dest:     route.Dest,
+			Gateway:  route.Gateway,
+			Device:   route.Device,
+			Source:   route.Source,
+			Scope:    route.Scope,
+			Priority: route.Priority,
 		}
 
 		aRoutes = append(aRoutes, aRoute)
@@ -1988,12 +1989,17 @@ func (k *kataAgent) convertToRoutes(aRoutes []*aTypes.Route) (routes []*vcTypes.
 		}
 
 		route := &vcTypes.Route{
-			Dest:    aRoute.Dest,
-			Gateway: aRoute.Gateway,
-			Device:  aRoute.Device,
-			Source:  aRoute.Source,
-			Scope:   aRoute.Scope,
+			Dest:     aRoute.Dest,
+			Gateway:  aRoute.Gateway,
+			Device:   aRoute.Device,
+			Source:   aRoute.Source,
+			Scope:    aRoute.Scope,
+			Priority: aRoute.Priority,
 		}
+
+		k.Logger().WithFields(logrus.Fields{
+			"Route": fmt.Sprintf("%+v", route),
+		}).Debug("Dumping routes received")
 
 		routes = append(routes, route)
 	}

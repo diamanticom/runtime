@@ -50,9 +50,12 @@
   name = "github.com/intel/govmm"
   revision = "9f389cb319af066f210b28dc8846d679878fe9f2"
 
+ignored = ["github.com/kata-containers/agent"]
+ 
 [[constraint]]
+  branch = "v1.8.0-patched-rc1"
   name = "github.com/kata-containers/agent"
-  revision = "48dd1c031530fce9bf16b0f6a7305979cedd8fc9"
+  source = "github.com/diamanticom/agent"
 
 [[constraint]]
   name = "github.com/containerd/cri-containerd"
