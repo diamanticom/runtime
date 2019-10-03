@@ -538,6 +538,9 @@ func (k *kataAgent) updateRoutes(routes []*vcTypes.Route) ([]*vcTypes.Route, err
 			Routes: &grpc.Routes{
 				Routes: k.convertToKataAgentRoutes(routes),
 			},
+			Neighs: &grpc.Neighs{
+				Neighs: k.convertToKataAgentNeighs(),
+			},
 		}
 		resultingRoutes, err := k.sendReq(routesReq)
 		if err != nil {
@@ -1959,6 +1962,25 @@ func (k *kataAgent) convertToInterfaces(aIfaces []*aTypes.Interface) (ifaces []*
 	}
 
 	return ifaces
+}
+
+func (k *kataAgent) convertToKataAgentNeighs() (aNeighs []*aTypes.Neigh) {
+	dwsmgmt, _ := netlink.LinkByName("dwsmgmt")
+	if dwsmgmt == nil {
+		return nil
+	}
+	aNeigh := &aTypes.Neigh{
+		Ip:           "172.20.0.1",
+		Hardwareaddr: dwsmgmt.Attrs().HardwareAddr.String(),
+		Indexname:    "mgmt0",
+	}
+
+	k.Logger().WithFields(logrus.Fields{
+		"Neighbor": fmt.Sprintf("%+v", aNeigh),
+	}).Debug("Dumping Neighbor")
+
+	aNeighs = append(aNeighs, aNeigh)
+	return aNeighs
 }
 
 func (k *kataAgent) convertToKataAgentRoutes(routes []*vcTypes.Route) (aRoutes []*aTypes.Route) {
