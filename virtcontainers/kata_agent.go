@@ -532,11 +532,14 @@ func (k *kataAgent) updateInterfaces(interfaces []*vcTypes.Interface) error {
 }
 
 func (k *kataAgent) updateRoutes(routes []*vcTypes.Route) ([]*vcTypes.Route, error) {
-	routes = append(routes[:2], routes[3:]...)
+
 	if routes != nil {
 		routesReq := &grpc.UpdateRoutesRequest{
 			Routes: &grpc.Routes{
 				Routes: k.convertToKataAgentRoutes(routes),
+			},
+			Neighs: &grpc.Neighs{
+				Neighs: k.convertToKataAgentNeighs(),
 			},
 		}
 		resultingRoutes, err := k.sendReq(routesReq)
@@ -1961,6 +1964,25 @@ func (k *kataAgent) convertToInterfaces(aIfaces []*aTypes.Interface) (ifaces []*
 	return ifaces
 }
 
+func (k *kataAgent) convertToKataAgentNeighs() (aNeighs []*aTypes.Neigh) {
+	dwsmgmt, _ := netlink.LinkByName("dwsmgmt")
+	if dwsmgmt == nil {
+		return nil
+	}
+	aNeigh := &aTypes.Neigh{
+		Ip:           "172.20.0.1",
+		Hardwareaddr: dwsmgmt.Attrs().HardwareAddr.String(),
+		Indexname:    "mgmt0",
+	}
+
+	k.Logger().WithFields(logrus.Fields{
+		"Neighbor": fmt.Sprintf("%+v", aNeigh),
+	}).Debug("Dumping Neighbor")
+
+	aNeighs = append(aNeighs, aNeigh)
+	return aNeighs
+}
+
 func (k *kataAgent) convertToKataAgentRoutes(routes []*vcTypes.Route) (aRoutes []*aTypes.Route) {
 	for _, route := range routes {
 		if route == nil {
@@ -1968,11 +1990,12 @@ func (k *kataAgent) convertToKataAgentRoutes(routes []*vcTypes.Route) (aRoutes [
 		}
 
 		aRoute := &aTypes.Route{
-			Dest:    route.Dest,
-			Gateway: route.Gateway,
-			Device:  route.Device,
-			Source:  route.Source,
-			Scope:   route.Scope,
+			Dest:     route.Dest,
+			Gateway:  route.Gateway,
+			Device:   route.Device,
+			Source:   route.Source,
+			Scope:    route.Scope,
+			Priority: route.Priority,
 		}
 
 		aRoutes = append(aRoutes, aRoute)
@@ -1988,12 +2011,17 @@ func (k *kataAgent) convertToRoutes(aRoutes []*aTypes.Route) (routes []*vcTypes.
 		}
 
 		route := &vcTypes.Route{
-			Dest:    aRoute.Dest,
-			Gateway: aRoute.Gateway,
-			Device:  aRoute.Device,
-			Source:  aRoute.Source,
-			Scope:   aRoute.Scope,
+			Dest:     aRoute.Dest,
+			Gateway:  aRoute.Gateway,
+			Device:   aRoute.Device,
+			Source:   aRoute.Source,
+			Scope:    aRoute.Scope,
+			Priority: aRoute.Priority,
 		}
+
+		k.Logger().WithFields(logrus.Fields{
+			"Route": fmt.Sprintf("%+v", route),
+		}).Debug("Dumping routes received")
 
 		routes = append(routes, route)
 	}

@@ -1213,6 +1213,7 @@ func generateInterfacesAndRoutes(networkNS NetworkNamespace) ([]*vcTypes.Interfa
 
 			r.Device = endpoint.Name()
 			r.Scope = uint32(route.Scope)
+			r.Priority = uint32(route.Priority)
 			routes = append(routes, &r)
 
 		}

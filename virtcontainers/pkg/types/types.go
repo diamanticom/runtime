@@ -33,9 +33,10 @@ type Interface struct {
 
 // Route describes a network route.
 type Route struct {
-	Dest    string
-	Gateway string
-	Device  string
-	Source  string
-	Scope   uint32
+	Dest     string
+	Gateway  string
+	Device   string
+	Source   string
+	Scope    uint32
+	Priority uint32
 }

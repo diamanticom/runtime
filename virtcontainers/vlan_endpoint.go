@@ -10,9 +10,7 @@ type VlanEndpoint struct {
 	NetPair            NetworkInterfacePair
 	EndpointProperties NetworkInfo
 	EndpointType       EndpointType
-	// todo: vlan id, how does this differ from pciaddress? how is it used?
-	VlanId  int
-	PCIAddr string
+	PCIAddr            string
 }
 
 func createVlanNetworkEndpoint(idx int, ifName string, interworkingModel NetInterworkingModel) (*VlanEndpoint, error) {
